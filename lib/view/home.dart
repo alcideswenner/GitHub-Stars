@@ -7,8 +7,8 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home>  {
-
+class _HomeState extends State<Home> {
+  TextEditingController textSearch = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +39,7 @@ class _HomeState extends State<Home>  {
             child: new ListTile(
               leading: new Icon(Icons.search),
               title: new TextField(
+                controller: textSearch,
                 maxLines: 1,
                 //controller: controller,
                 decoration: new InputDecoration(
