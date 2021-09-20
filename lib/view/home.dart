@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:github_stars/componentes/search_data.dart';
 import 'package:github_stars/models/user.dart';
-import 'package:github_stars/requests/acess_token_github.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +12,9 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
+  Color colorWhite = Colors.white;
   TextEditingController textSearch = TextEditingController();
+  String loginBusca = "";
   @override
   Widget build(BuildContext context) {
     String readRepositories = """
@@ -48,43 +50,67 @@ class _Home extends State<Home> {
       ),
       body: Query(
           options: QueryOptions(
-            document: gql(body),
+            document: gql(readRepositories),
             variables: {
-              'nlogin': "alcideswenner",
+              'nlogin': loginBusca,
             },
             pollInterval: Duration(seconds: 10),
           ),
           builder: (QueryResult result,
               {VoidCallback? refetch, FetchMore? fetchMore}) {
             if (result.hasException) {
-              return Text(result.exception.toString());
+              return cardInfoUser(new User());
             }
-
             if (result.isLoading) {
-              return Text('Loading');
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }
             // it can be either Map or List
             Map<String, dynamic> d = result.data!["user"];
             User users = User.fromJson(d);
 
-            List<User> lista = [];
-            lista.add(users);
+            List<Nodes> lista = users.starredRepositories!.nodes!.toList();
+
             //  print(result.data!["user"]["starredRepositories"]["nodes"]);
-            return ListView.builder(
-                itemCount: lista.length,
-                itemBuilder: (context, index) {
-                  //final repository = repositories[index];
-                  lista[index].starredRepositories!.nodes!.forEach((element) {
-                    print(element.name);
-                  });
-                  if (index == 0) {
-                    return cardInfoUser();
-                  } else if (index >= 1) {
-                    return Text("oi");
-                  } else {
-                    return SizedBox();
-                  }
-                });
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  cardInfoUser(users),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 100,
+                    child: ListView.builder(
+                        itemCount: lista.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(
+                              lista[index].name.toString(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              lista[index].description.toString(),
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            trailing: Column(
+                              children: [
+                                Icon(Icons.stars),
+                                Text(
+                                  lista[index]
+                                      .stargazers!
+                                      .totalCount
+                                      .toString(),
+                                  style: TextStyle(color: Colors.black),
+                                )
+                              ],
+                            ),
+                          );
+                        }),
+                  )
+                ],
+              ),
+            );
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
@@ -94,9 +120,9 @@ class _Home extends State<Home> {
     );
   }
 
-  Widget cardInfoUser() {
+  Widget cardInfoUser(User user) {
     return Container(
-      height: 250,
+      //  height: 250,
       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
       //    width: MediaQuery.of(context).size.width - 50,
       decoration: BoxDecoration(
@@ -114,17 +140,48 @@ class _Home extends State<Home> {
                 //controller: controller,
                 decoration: new InputDecoration(
                     hintText: 'Buscar', border: InputBorder.none),
-                //onChanged: onSearchTextChanged,
               ),
               trailing: new IconButton(
-                icon: new Icon(Icons.cancel),
+                icon: new Icon(Icons.search),
                 onPressed: () {
-                  // controller.clear();
-                  // onSearchTextChanged('');
+                  setState(() {
+                    loginBusca = textSearch.text;
+                  });
                 },
               ),
             ),
           ),
+          user.name == null
+              ? Text("")
+              : ListTile(
+                  leading: CircleAvatar(
+                    maxRadius: 25,
+                    backgroundColor: colorWhite,
+                    backgroundImage: NetworkImage(user.avatarUrl.toString()),
+                  ),
+                  title: Text(user.name.toString(),
+                      style: TextStyle(color: colorWhite)),
+                  subtitle: Text(user.bio.toString(),
+                      style: TextStyle(color: colorWhite)),
+                ),
+          user.name == null
+              ? Text("")
+              : ListTile(
+                  title: Text(user.location.toString(),
+                      style: TextStyle(color: colorWhite)),
+                  subtitle: Text(user.email.toString(),
+                      style: TextStyle(color: colorWhite)),
+                  trailing: Column(
+                    children: [
+                      Icon(
+                        Icons.stars,
+                        color: colorWhite,
+                      ),
+                      Text(user.starredRepositories!.totalCount.toString(),
+                          style: TextStyle(color: colorWhite))
+                    ],
+                  ),
+                ),
         ],
       )),
     );

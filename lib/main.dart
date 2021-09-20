@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:github_stars/requests/acess_token_github.dart';
 import 'package:github_stars/view/home.dart';
 import 'package:github_stars/view/splash_page_init.dart';
 import 'package:graphql/client.dart';
@@ -13,6 +12,7 @@ void main() async {
       statusBarIconBrightness: Brightness.light));
   runApp(MaterialApp(
       theme: ThemeData(
+        accentColor: Colors.black,
         appBarTheme: AppBarTheme(
           backwardsCompatibility: false, // 1
           systemOverlayStyle: SystemUiOverlayStyle.light, // 2
@@ -31,11 +31,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HttpLink httpLink = HttpLink(
-      URL_BASE,
+      'https://api.github.com/graphql',
     );
 
     final AuthLink authLink = AuthLink(
-      getToken: () async => 'Bearer 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',
+      getToken: () async => 'Bearer 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',
     );
 
     final Link link = authLink.concat(httpLink);
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
     );
     return GraphQLProvider(
       client: client,
-      child: Home(title: "GitHub Stars"),
+      child: Home(title: "Git"),
     );
   }
 }
