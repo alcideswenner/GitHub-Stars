@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:github_stars/requests/acess_token_github.dart';
 import 'package:github_stars/view/home.dart';
 import 'package:github_stars/view/splash_page_init.dart';
+import 'package:graphql/client.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 void main() async {
-   await initHiveForFlutter();
+  await initHiveForFlutter();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.black54,
       statusBarIconBrightness: Brightness.light));
@@ -20,22 +21,25 @@ void main() async {
       debugShowCheckedModeBanner: false,
       title: "GitHub Stars",
       initialRoute: 'init',
-      routes: {'/': (context) => Home(), 'init': (context) => Init()}));
+      routes: {
+        '/': (context) => MyApp(),
+        'init': (context) => PageInicial(),
+      }));
 }
 
-class Init extends StatelessWidget {
-  const Init({Key? key}) : super(key: key);
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HttpLink httpLink = HttpLink(
-      'https://api.github.com/graphql',
+      URL_BASE,
     );
 
     final AuthLink authLink = AuthLink(
-        getToken: () async =>
-            'Bearer $token');
+      getToken: () async => 'Bearer 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',
+    );
+
     final Link link = authLink.concat(httpLink);
+
     ValueNotifier<GraphQLClient> client = ValueNotifier(
       GraphQLClient(
         link: link,
@@ -44,7 +48,7 @@ class Init extends StatelessWidget {
     );
     return GraphQLProvider(
       client: client,
-      child: PageInicial(),
+      child: Home(title: "GitHub Stars"),
     );
   }
 }
