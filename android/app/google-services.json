@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "364997205071",
+    "project_id": "configgithub",
+    "storage_bucket": "configgithub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364997205071:android:953c987f45bda086059e3a",
+        "android_client_info": {
+          "package_name": "com.alcideswenner.github_stars"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "364997205071-hajvqvii234a9u5gk307do1pb3dip4hd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf-AsQnnGo9DfiidnbSf3JymFaal92FlU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "364997205071-hajvqvii234a9u5gk307do1pb3dip4hd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

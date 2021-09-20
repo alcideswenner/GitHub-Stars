@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:github_stars/view/home.dart';
@@ -6,6 +8,9 @@ import 'package:graphql/client.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  RemoteConfig.instance.fetchAndActivate();
   await initHiveForFlutter();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.black54,
@@ -30,12 +35,13 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String token = RemoteConfig.instance.getString("token_git_hub");
     final HttpLink httpLink = HttpLink(
       'https://api.github.com/graphql',
     );
 
     final AuthLink authLink = AuthLink(
-      getToken: () async => 'Bearer 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',
+      getToken: () async => 'Bearer $token',
     );
 
     final Link link = authLink.concat(httpLink);

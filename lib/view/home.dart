@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:github_stars/componentes/search_data.dart';
 import 'package:github_stars/models/user.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
