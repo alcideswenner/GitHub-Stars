@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:github_stars/models/user.dart';
+import 'package:github_stars/requests/acess_token_github.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   Home({Key? key, required this.title}) : super(key: key);
@@ -16,30 +18,6 @@ class _Home extends State<Home> {
   String loginBusca = "";
   @override
   Widget build(BuildContext context) {
-    String readRepositories = """
-   query ReadRepositories(\$nlogin: String!) {
-  user(login:\$nlogin){
-    name
-    avatarUrl
-    bio
-    location
-    email
-    url
-    starredRepositories{
-      totalCount
-      nodes{
-        name
-        description
-       stargazers{
-        totalCount
-      }
-      }
-    }
-}
-    
-}
-
-""";
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -49,7 +27,7 @@ class _Home extends State<Home> {
       ),
       body: Query(
           options: QueryOptions(
-            document: gql(readRepositories),
+            document: gql(body),
             variables: {
               'nlogin': loginBusca,
             },
@@ -58,7 +36,9 @@ class _Home extends State<Home> {
           builder: (QueryResult result,
               {VoidCallback? refetch, FetchMore? fetchMore}) {
             if (result.hasException) {
-              return cardInfoUser(new User());
+              return SingleChildScrollView(
+                child: cardInfoUser(new User()),
+              );
             }
             if (result.isLoading) {
               return Center(
@@ -71,59 +51,34 @@ class _Home extends State<Home> {
 
             List<Nodes> lista = users.starredRepositories!.nodes!.toList();
 
-            //  print(result.data!["user"]["starredRepositories"]["nodes"]);
             return SingleChildScrollView(
               child: Column(
                 children: [
                   cardInfoUser(users),
-                  Container(
-                    height: MediaQuery.of(context).size.height - 100,
-                    child: ListView.builder(
-                        itemCount: lista.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(
-                              lista[index].name.toString(),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              lista[index].description.toString(),
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            trailing: Column(
-                              children: [
-                                Icon(Icons.stars),
-                                Text(
-                                  lista[index]
-                                      .stargazers!
-                                      .totalCount
-                                      .toString(),
-                                  style: TextStyle(color: Colors.black),
-                                )
-                              ],
-                            ),
-                          );
-                        }),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  listRespositories(lista),
+                  SizedBox(
+                    height: 100,
                   )
                 ],
               ),
             );
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
+        onPressed: () async => await canLaunch("https://github.com/Xerpa")
+            ? await launch("https://github.com/Xerpa")
+            : throw 'Could not launch ',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 
   Widget cardInfoUser(User user) {
     return Container(
-      //  height: 250,
+      height: user.name == null ? MediaQuery.of(context).size.height : null,
       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-      //    width: MediaQuery.of(context).size.width - 50,
       decoration: BoxDecoration(
         color: Colors.black87,
       ),
@@ -132,13 +87,15 @@ class _Home extends State<Home> {
         children: [
           new Card(
             child: new ListTile(
+              
               leading: new Icon(Icons.search),
               title: new TextField(
                 controller: textSearch,
                 maxLines: 1,
                 //controller: controller,
                 decoration: new InputDecoration(
-                    hintText: 'Buscar', border: InputBorder.none),
+                    hintText: 'Digite o nome do usuário',
+                    border: InputBorder.none),
               ),
               trailing: new IconButton(
                 icon: new Icon(Icons.search),
@@ -153,13 +110,14 @@ class _Home extends State<Home> {
           user.name == null
               ? Text("")
               : ListTile(
+                contentPadding: EdgeInsets.only(top: 10),
                   leading: CircleAvatar(
                     maxRadius: 25,
                     backgroundColor: colorWhite,
                     backgroundImage: NetworkImage(user.avatarUrl.toString()),
                   ),
                   title: Text(user.name.toString(),
-                      style: TextStyle(color: colorWhite)),
+                      style: TextStyle(color: colorWhite,fontWeight: FontWeight.bold,fontSize: 16)),
                   subtitle: Text(user.bio.toString(),
                       style: TextStyle(color: colorWhite)),
                 ),
@@ -181,8 +139,62 @@ class _Home extends State<Home> {
                     ],
                   ),
                 ),
+          user.name == null
+              ? SizedBox(
+                  height: 60,
+                )
+              : Text(""),
+          user.name == null
+              ? Column(
+                  children: [
+                    Image.asset(
+                      'assets/logo_2.png',
+                      width: MediaQuery.of(context).size.width - 200,
+                    ),
+                    Center(
+                      child: Text("Pesquise um usuário",
+                          style: TextStyle(color: colorWhite, fontSize: 20)),
+                    )
+                  ],
+                )
+              : Text("")
         ],
       )),
+    );
+  }
+
+  Widget listRespositories(List<Nodes> lista) {
+    return Container(
+      // height: MediaQuery.of(context).size.height - 100,
+      child: ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: lista.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(
+                lista[index].name.toString(),
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                lista[index].description.toString(),
+                style: TextStyle(color: Colors.black),
+              ),
+              trailing: Column(
+                children: [
+                  Icon(
+                    Icons.stars,
+                    color: Colors.black,
+                  ),
+                  Text(
+                    lista[index].stargazers!.totalCount.toString(),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            );
+          }),
     );
   }
 }

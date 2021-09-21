@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:github_stars/requests/acess_token_github.dart';
 import 'package:github_stars/view/home.dart';
 import 'package:github_stars/view/splash_page_init.dart';
 import 'package:graphql/client.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     String token = RemoteConfig.instance.getString("token_git_hub");
     final HttpLink httpLink = HttpLink(
-      'https://api.github.com/graphql',
+      URL_BASE,
     );
 
     final AuthLink authLink = AuthLink(
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
     );
     return GraphQLProvider(
       client: client,
-      child: Home(title: "Git"),
+      child: Home(title: "GitHub Stars"),
     );
   }
 }
