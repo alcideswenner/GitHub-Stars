@@ -1,16 +1,12 @@
-# github_stars
+# GitHub-Stars
 
-A new Flutter project.
+## 💻 Pré-requisitos
 
-## Getting Started
+Antes de começar, digite o comando pub get
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## 📝 Licença
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE.md) para mais detalhes.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+[⬆ Voltar ao topo](#nome-do-projeto)<br>
