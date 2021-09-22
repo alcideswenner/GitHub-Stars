@@ -31,7 +31,7 @@ class _Home extends State<Home> {
             variables: {
               'nlogin': loginBusca,
             },
-            pollInterval: Duration(seconds: 10),
+            pollInterval: Duration(seconds: 2),
           ),
           builder: (QueryResult result,
               {VoidCallback? refetch, FetchMore? fetchMore}) {
@@ -87,7 +87,6 @@ class _Home extends State<Home> {
         children: [
           new Card(
             child: new ListTile(
-              
               leading: new Icon(Icons.search),
               title: new TextField(
                 controller: textSearch,
@@ -110,17 +109,31 @@ class _Home extends State<Home> {
           user.name == null
               ? Text("")
               : ListTile(
-                contentPadding: EdgeInsets.only(top: 10),
+                  contentPadding: EdgeInsets.only(top: 10),
                   leading: CircleAvatar(
                     maxRadius: 25,
                     backgroundColor: colorWhite,
                     backgroundImage: NetworkImage(user.avatarUrl.toString()),
                   ),
                   title: Text(user.name.toString(),
-                      style: TextStyle(color: colorWhite,fontWeight: FontWeight.bold,fontSize: 16)),
-                  subtitle: Text(user.bio.toString(),
-                      style: TextStyle(color: colorWhite)),
-                ),
+                      style: TextStyle(
+                          color: colorWhite,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(user.bio.toString(),
+                          style: TextStyle(color: colorWhite)),
+                      GestureDetector(
+                        onTap: () async => await canLaunch(user.url.toString())
+                            ? await launch(user.url.toString())
+                            : throw 'Could not launch',
+                        child: Text(user.url.toString(),
+                            style: TextStyle(color: Colors.blue, fontSize: 14)),
+                      )
+                    ],
+                  )),
           user.name == null
               ? Text("")
               : ListTile(
